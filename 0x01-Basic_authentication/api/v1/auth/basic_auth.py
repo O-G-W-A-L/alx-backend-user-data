@@ -3,7 +3,7 @@
 """
 from api.v1.auth.auth import Auth
 import re
-from typing import Tuple, TypeVar
+from typing import TypeVar
 import base64
 import binascii
 
@@ -43,7 +43,7 @@ class BasicAuth(Auth):
     def extract_user_credentials(
             self,
             decoded_base64_authorization_header: str
-            ) -> Tuple[str, str]:
+            ) -> (str, str):
         """Extracts user credentials from a base64-decoded authorization
         header that uses the Basic authentication flow
         """
@@ -62,16 +62,15 @@ class BasicAuth(Auth):
             self,
             user_email: str,
             user_pwd: str) -> TypeVar('User'):
-        """Retrieves a user based on the user's authentication credentials
+        """Retrieves a user based on the user's authentication credentials.
         """
-        if isinstance(user_email, str) and isinstance(user_pwd, str):
+        if type(user_email) == str and type(user_pwd) == str:
             try:
-                users = User.search(user_email)
+                users = User.search({'email': user_email})
             except Exception:
                 return None
-            if not users:
+            if len(users) <= 0:
                 return None
-            user = users[0]
-            if user.is_valid_password(user_pwd):
-                return user
+            if users[0].is_valid_password(user_pwd):
+                return users[0]
         return None
