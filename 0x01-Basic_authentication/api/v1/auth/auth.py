@@ -31,18 +31,17 @@ class Auth:
                     return False
             elif normalized_path == normalized_exclusion:
                 return False
-
         return True
 
     def authorization_header(self, request=None) -> Optional[str]:
         """
         Gets the authorization header field from the request.
         Returns:
-            str: The value of the Authorization header, or None if not present.
+        str: The value of the Authorization header, or None if not present.
         """
         if request is not None:
             return request.headers.get('Authorization', None)
-        return None 
+        return None
 
     def current_user(self) -> Optional[TypeVar('User')]:
         """
