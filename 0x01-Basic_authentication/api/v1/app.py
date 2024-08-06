@@ -55,8 +55,8 @@ def authenticate_user():
             print(f"Authorization Header: {auth_header}") #debugging line
             if auth_header is None:
                 abort(401)
-            if auth.current_user(request) is None:
-                print(f"Current User: {user}") #debugging line
+            user = auth.current_user(request)
+            if user is None:
                 abort(403)
 
 
