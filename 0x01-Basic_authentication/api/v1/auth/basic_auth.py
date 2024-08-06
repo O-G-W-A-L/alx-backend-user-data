@@ -3,7 +3,7 @@
 """
 from api.v1.auth.auth import Auth
 import re
-from typing import Optional, Tuple
+from typing import Tuple, TypeVar
 import base64
 import binascii
 
@@ -13,7 +13,7 @@ class BasicAuth(Auth):
     """
     def extract_base64_authorization_header(
             self,
-            authorization_header: Optional[str]) -> Optional[str]:
+            authorization_header: str) -> str:
         """Extracts the Base64 part of the Authorization header
         for Basic Authentication
         """
@@ -26,8 +26,8 @@ class BasicAuth(Auth):
 
     def decode_base64_authorization_header(
             self,
-            base64_authorization_header: Optional[str]
-            ) -> Optional[str]:
+            base64_authorization_header: str
+            ) -> str:
         """Decodes a base64-encoded authorization header
         """
         if isinstance(base64_authorization_header, str):
@@ -42,8 +42,8 @@ class BasicAuth(Auth):
 
     def extract_user_credentials(
             self,
-            decoded_base64_authorization_header: Optional[str]
-            ) -> Optional[Tuple[str, str]]:
+            decoded_base64_authorization_header: str
+            ) -> (str, str):
         """Extracts user credentials from a base64-decoded authorization
         header that uses the Basic authentication flow
         """
@@ -57,3 +57,21 @@ class BasicAuth(Auth):
                 password = field_match.group('password')
                 return user, password
         return None, None
+
+    def user_object_from_credentials(
+            self,
+            user_email: str,
+            user_pwd: str) -> TypeVar('User'):
+        """Retrieves a user based on the user's authentication credentials
+        """
+        if isinstance(user_email, str) and isinstance(user_pwd, str):
+            try:
+                users = User.search(user_email)
+            except Exception:
+                return None
+            if not users:
+                return None
+            user = users[0]
+            if user.is_valid_password(user_pwd):
+                return user
+        return None
