@@ -5,7 +5,6 @@ import re
 import base64
 import binascii
 from typing import Tuple, TypeVar
-
 from .auth import Auth
 from models.user import User
 
@@ -17,7 +16,7 @@ class BasicAuth(Auth):
             self,
             authorization_header: str) -> str:
         """Extracts the Base64 part of the Authorization header
-        for a Basic Authentication.
+        for a Basic Authentication
         """
         if type(authorization_header) == str:
             pattern = r'Basic (?P<token>.+)'

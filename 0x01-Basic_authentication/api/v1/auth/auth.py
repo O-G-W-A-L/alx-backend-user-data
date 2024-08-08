@@ -1,52 +1,38 @@
 #!/usr/bin/env python3
-"""Authentication module for the API.
+"""Authentication module for the API
 """
 import re
-from typing import List, Optional, TypeVar
+from typing import List, TypeVar
 from flask import request
 
 
 class Auth:
-    """Authentication class to manage API authentication.
+    """Authentication class to manage API authenticaion
     """
-
-    def require_auth(
-            self, path: Optional[str],
-            excluded_paths: Optional[List[str]]) -> bool:
+    def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
+        """Checks if a path requires authentication.
         """
-        Checks if a path requires authentication
-        Returns:
-            bool: True if the path requires authentication, False otherwise.
-        """
-        if not path or not excluded_paths:
-            return True
-
-        # Normalize the path for comparison
-        normalized_path = path.rstrip('/') + '/'
-
-        for exclusion_path in excluded_paths:
-            normalized_exclusion = exclusion_path.rstrip('/') + '/'
-            if normalized_exclusion.endswith('*'):
-                if normalized_path.startswith(normalized_exclusion[:-1]):
+        if path is not None and excluded_paths is not None:
+            for exclusion_path in map(lambda x: x.strip(), excluded_paths):
+                pattern = ''
+                if exclusion_path[-1] == '*':
+                    pattern = '{}.*'.format(exclusion_path[0:-1])
+                elif exclusion_path[-1] == '/':
+                    pattern = '{}/*'.format(exclusion_path[0:-1])
+                else:
+                    pattern = '{}/*'.format(exclusion_path)
+                if re.match(pattern, path):
                     return False
-            elif normalized_path == normalized_exclusion:
-                return False
         return True
 
-    def authorization_header(self, request=None) -> Optional[str]:
-        """
-        Gets the authorization header field from the request.
-        Returns:
-        str: The value of the Authorization header, or None if not present.
+    def authorization_header(self, request=None) -> str:
+        """Gets the authorization header field from the request.
         """
         if request is not None:
             return request.headers.get('Authorization', None)
         return None
 
-    def current_user(self, request=None) -> Optional[TypeVar('User')]:
-        """
-        Gets the current user from the request.
-        Returns:
-            User: The user object or None if not available.
+    def current_user(self, request=None) -> TypeVar('User'):
+        """Gets the current user from the request.
         """
         return None
