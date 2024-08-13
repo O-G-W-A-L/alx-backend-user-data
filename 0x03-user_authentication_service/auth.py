@@ -3,6 +3,7 @@
 
 import bcrypt
 from bcrypt import checkpw
+import uuid
 from uuid import uuid4
 from db import DB
 from user import User
@@ -50,3 +51,13 @@ class Auth:
         except NoResultFound:
             pass
         return False
+
+    def create_session(self, email: str) -> str:
+        """Creates a new session for the user and returns the session ID."""
+        try:
+            user = self._db.find_user_by(email=email)
+            session_id = str(uuid.uuid4())
+            self._db.update_user(user.id, session_id=session_id)
+            return session_id
+        except NoResultFound:
+            return None
